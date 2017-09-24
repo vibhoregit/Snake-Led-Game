@@ -1,0 +1,116 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<conio.h>
+#include<windows.h>
+#define xbound 16
+#define ybound 16
+#define default_delay 400
+
+char x,y,fx,fy = 0;     //x,y is snake's head and fx,fy the fruit.
+int score = 0;
+char gameover = 0;
+char direction = 0;
+char input_flag = 0;
+int delay = default_delay;
+int level = 1;
+
+void init_game()
+{
+	srand((int)time(NULL));
+	gameover = 0;
+	direction = 0;
+	level = 1;
+	delay = default_delay;
+	score = 0;
+	x = xbound>>2;
+	y = ybound>>2;        //x = xbound/2 (because right shift is equivalent to division by 2)
+	fx = rand()%xbound;
+	fy = rand()%ybound;
+}
+
+void draw()
+{
+	int i = 0;
+	int  j = 0;
+	system("cls");
+	for(i = 0; i < xbound+2;i++)
+		printf("#");
+	printf("\n");
+	for(i = 0; i<ybound ;i++)
+	{
+		printf("#");
+		for(j = 0; j < xbound; j++)
+		{
+			if(i == y && j == x)
+				printf("@");
+			else if(i == fy && j == fx )
+				printf("o");
+			else
+				printf(" ");
+		}
+		printf("#\n");
+	}
+	for(i = 0; i < xbound+2;i++)
+		printf("#");
+	printf("\n");
+}
+void input()
+{
+	char temp;
+	if(kbhit())
+	{
+		temp = getch();
+		if(input_flag == 0)
+		{	
+			direction = temp;
+			input_flag = 1;
+		}
+	}
+	
+}
+
+void update()
+{
+	switch(direction)
+	{
+		case 'w':	y--;
+				break;
+		case 'd':	x++;
+				break;
+		case 's':	y++;
+				break;
+		case 'a':	x--;
+				break;
+		case 'p':	gameover = 1;	
+		default: break;
+	}
+	if(x == fx && y == fy)
+	{
+		score++;
+		if(score%5 == 0)
+		{
+			level++;
+			delay -= 50;
+		}
+		fx = rand()%xbound;
+		fy = rand()%ybound;
+	}
+	else if(x == -1 || x == xbound || y == -1 || y == ybound )
+		gameover = 1;
+	input_flag = 0;
+}
+
+void main()
+{
+	init_game();
+	while(gameover == 0)
+	{
+		draw();
+		printf("\n Level : %d",level);
+		printf("\n Score : %d \n",score);
+		Sleep(delay);
+		input();
+		update();
+	}
+}
